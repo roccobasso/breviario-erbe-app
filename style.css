@@ -17,33 +17,46 @@ body {
   padding: 20px;
 }
 
-.controls {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 20px 0;
-}
-
-.controls input,
-.controls select {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-}
-
-.controls input {
-  flex: 1;
-  min-width: 260px;
-}
-
 .notice {
   background: #fff7ed;
   border: 1px solid #f59e0b;
   color: #7c2d12;
   padding: 14px;
   border-radius: 10px;
+  margin: 20px 0;
+}
+
+.controls,
+.upload-box {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
   margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.controls input,
+.controls select,
+.upload-box input,
+.upload-box select,
+.upload-box button {
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.upload-box button {
+  background: #2f6b3d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .stats {
@@ -67,10 +80,6 @@ body {
 
 .card:hover {
   border-color: #2f6b3d;
-}
-
-.card h3 {
-  margin-top: 0;
 }
 
 .badge {
@@ -97,8 +106,9 @@ body {
   color: #b91c1c;
 }
 
-.detail {
-  margin-top: 30px;
+.detail,
+.result-box {
+  margin-top: 20px;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -107,16 +117,4 @@ body {
 
 .hidden {
   display: none;
-}
-
-.detail h2 {
-  margin-top: 0;
-}
-
-.detail p {
-  line-height: 1.6;
-}
-
-.detail ul {
-  line-height: 1.6;
 }
