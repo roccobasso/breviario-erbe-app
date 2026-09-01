@@ -6,6 +6,11 @@ const plantList = document.getElementById("plantList");
 const plantDetail = document.getElementById("plantDetail");
 const stats = document.getElementById("stats");
 
+const photoInput = document.getElementById("photoInput");
+const organInput = document.getElementById("organInput");
+const identifyBtn = document.getElementById("identifyBtn");
+const identifyResult = document.getElementById("identifyResult");
+
 fetch("plants.json")
   .then((res) => res.json())
   .then((data) => {
@@ -23,12 +28,11 @@ function applyFilters() {
 
   const filtered = allPlants.filter((plant) => {
     const matchesText =
-      plant.italianName.toLowerCase().includes(text) ||
-      plant.scientificName.toLowerCase().includes(text) ||
+      (plant.italianName || "").toLowerCase().includes(text) ||
+      (plant.scientificName || "").toLowerCase().includes(text) ||
       (plant.aliases || []).join(" ").toLowerCase().includes(text);
 
     const matchesCategory = !category || plant.category === category;
-
     return matchesText && matchesCategory;
   });
 
@@ -51,9 +55,7 @@ function renderPlants(plants) {
       <h3>${plant.italianName}</h3>
       <p><em>${plant.scientificName}</em></p>
       <p><strong>Famiglia:</strong> ${plant.family || "-"}</p>
-      <p>${(plant.description || "").slice(0, 160)}...</p>
     `;
-
     card.addEventListener("click", () => showPlantDetail(plant));
     plantList.appendChild(card);
   });
@@ -61,28 +63,21 @@ function renderPlants(plants) {
 
 function showPlantDetail(plant) {
   plantDetail.classList.remove("hidden");
-
   plantDetail.innerHTML = `
     <h2>${plant.italianName}</h2>
     <p><em>${plant.scientificName}</em></p>
     <p><strong>Categoria:</strong> ${plant.category}</p>
     <p><strong>Famiglia:</strong> ${plant.family || "-"}</p>
-    <p><strong>Tipo biologico:</strong> ${plant.biologicalType || "-"}</p>
     <p><strong>Descrizione:</strong> ${plant.description || "-"}</p>
     <p><strong>Habitat:</strong> ${plant.habitat || "-"}</p>
     <p><strong>Fioritura:</strong> ${plant.flowering || "-"}</p>
-    <p><strong>Frutti:</strong> ${plant.fruits || "-"}</p>
     ${plant.edibleUse ? `<p><strong>Uso alimentare:</strong> ${plant.edibleUse}</p>` : ""}
     ${plant.medicinalUse ? `<p><strong>Uso officinale:</strong> ${plant.medicinalUse}</p>` : ""}
     ${plant.toxicity ? `<p><strong>Tossicità:</strong> ${plant.toxicity}</p>` : ""}
-    ${renderList("Nomi alternativi", plant.aliases)}
-    ${renderList("Ricette tradizionali", plant.traditionalRecipes)}
-    ${renderList("Usi tradizionali", plant.traditionalUses)}
     ${renderList("Piante simili", plant.similarPlants)}
     ${renderList("Curiosità", plant.curiosities)}
     ${renderList("Avvertenze", plant.warnings)}
   `;
-
   plantDetail.scrollIntoView({ behavior: "smooth" });
 }
 
@@ -90,8 +85,53 @@ function renderList(title, items) {
   if (!items || !items.length) return "";
   return `
     <h3>${title}</h3>
-    <ul>
-      ${items.map((item) => `<li>${item}</li>`).join("")}
-    </ul>
+    <ul>${items.map((x) => `<li>${x}</li>`).join("")}</ul>
   `;
 }
+
+identifyBtn.addEventListener("click", async () => {
+  if (!photoInput.files || !photoInput.files[0]) {
+    identifyResult.innerHTML = "<p>Seleziona prima una foto.</p>";
+    return;
+  }
+
+  identifyResult.innerHTML = "<p>Analisi in corso...</p>";
+
+  const formData = new FormData();
+  formData.append("image", photoInput.files[0]);
+  formData.append("organ", organInput.value);
+
+  try {
+    const res = await fetch("/api/identify", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      identifyResult.innerHTML = `<p><strong>Errore:</strong> ${data.error}</p>`;
+      return;
+    }
+
+    let html = `
+      <h3>Risultato Pl@ntNet</h3>
+      <p><strong>Nome scientifico:</strong> ${data.bestScientificName}</p>
+      <p><strong>Affidabilità:</strong> ${(data.score * 100).toFixed(1)}%</p>
+    `;
+
+    if (data.localMatch) {
+      html += `<p><strong>Scheda trovata nel tuo archivio:</strong> ${data.localMatch.italianName}</p>`;
+      const plant = allPlants.find(p => p.scientificName === data.localMatch.scientificName);
+      if (plant) {
+        showPlantDetail(plant);
+      }
+    } else {
+      html += `<p>Pianta identificata, ma non ancora presente nel tuo archivio.</p>`;
+    }
+
+    identifyResult.innerHTML = html;
+  } catch (err) {
+    identifyResult.innerHTML = "<p>Errore di rete.</p>";
+  }
+});
