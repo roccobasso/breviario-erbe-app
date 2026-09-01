@@ -11,6 +11,7 @@ function normalizeText(str) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/['']/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -32,6 +33,12 @@ function stripAuthorFromScientificName(name) {
   return cleaned;
 }
 
+function getScientificGenus(name) {
+  const stripped = stripAuthorFromScientificName(name);
+  if (!stripped) return "";
+  return stripped.split(" ")[0] || "";
+}
+
 function extractScientificCandidates(value) {
   const raw = (value || "").toString();
 
@@ -47,6 +54,17 @@ function splitAliases(value) {
     .split(/[,;/|]/g)
     .map((item) => normalizeText(item))
     .filter(Boolean);
+}
+
+function normalizeList(values) {
+  return (Array.isArray(values) ? values : [])
+    .map((item) => normalizeText(item))
+    .filter(Boolean);
+}
+
+function includesEitherWay(a, b) {
+  if (!a || !b) return false;
+  return a === b || a.includes(b) || b.includes(a);
 }
 
 function getEl(...ids) {
@@ -350,11 +368,13 @@ function showPlantDetail(plant) {
 
 function findMatchingPlantByScientificName(bestScientificName) {
   const resultScientific = stripAuthorFromScientificName(bestScientificName);
+  const resultGenus = getScientificGenus(bestScientificName);
 
   if (!resultScientific) return null;
 
   debugLog("Nome restituito da Pl@ntNet:", bestScientificName);
   debugLog("Nome normalizzato risultato:", resultScientific);
+  debugLog("Genere risultato:", resultGenus);
   debugLog("Piante caricate:", allPlants.length);
 
   for (const plant of allPlants) {
@@ -362,7 +382,7 @@ function findMatchingPlantByScientificName(bestScientificName) {
     const candidates = extractScientificCandidates(rawScientific);
     const normalizedBest = normalizeText(bestScientificName);
 
-    const isMatch = candidates.some((candidate) => {
+    const isExactOrClose = candidates.some((candidate) => {
       const normalizedCandidate = normalizeText(candidate);
 
       return (
@@ -373,7 +393,7 @@ function findMatchingPlantByScientificName(bestScientificName) {
       );
     });
 
-    if (isMatch) {
+    if (isExactOrClose) {
       debugLog("MATCH SCIENTIFICO TROVATO:", {
         italianName: getPlantItalianName(plant),
         rawScientific,
@@ -388,9 +408,7 @@ function findMatchingPlantByScientificName(bestScientificName) {
 }
 
 function findMatchingPlantByCommonNames(commonNames = []) {
-  const normalizedCommonNames = (Array.isArray(commonNames) ? commonNames : [])
-    .map((name) => normalizeText(name))
-    .filter(Boolean);
+  const normalizedCommonNames = normalizeList(commonNames);
 
   if (!normalizedCommonNames.length) return null;
 
@@ -404,15 +422,15 @@ function findMatchingPlantByCommonNames(commonNames = []) {
     const matched = normalizedCommonNames.some((commonName) => {
       if (!commonName) return false;
 
-      if (italianName === commonName || italianName.includes(commonName) || commonName.includes(italianName)) {
+      if (includesEitherWay(italianName, commonName)) {
         return true;
       }
 
-      if (aliases.some(alias => alias === commonName || alias.includes(commonName) || commonName.includes(alias))) {
+      if (aliases.some((alias) => includesEitherWay(alias, commonName))) {
         return true;
       }
 
-      if (scientificRaw.includes(commonName) || commonName.includes(scientificRaw)) {
+      if (includesEitherWay(scientificRaw, commonName)) {
         return true;
       }
 
@@ -432,10 +450,48 @@ function findMatchingPlantByCommonNames(commonNames = []) {
   return null;
 }
 
+function findMatchingPlantByGenusAndAlias(bestScientificName, commonNames = []) {
+  const genus = getScientificGenus(bestScientificName);
+  const normalizedCommonNames = normalizeList(commonNames);
+
+  if (!genus || !normalizedCommonNames.length) return null;
+
+  for (const plant of allPlants) {
+    const plantScientific = getPlantScientificName(plant);
+    const plantGenus = getScientificGenus(plantScientific);
+    const italianName = normalizeText(getPlantItalianName(plant));
+    const aliases = splitAliases(getPlantAliases(plant));
+
+    if (plantGenus !== genus) {
+      continue;
+    }
+
+    const hasCommonSupport = normalizedCommonNames.some((commonName) => {
+      return (
+        includesEitherWay(italianName, commonName) ||
+        aliases.some((alias) => includesEitherWay(alias, commonName))
+      );
+    });
+
+    if (hasCommonSupport) {
+      debugLog("MATCH GENERE + NOME COMUNE TROVATO:", {
+        italianName: getPlantItalianName(plant),
+        scientificName: plantScientific,
+        genus,
+        aliases: getPlantAliases(plant)
+      });
+      return plant;
+    }
+  }
+
+  return null;
+}
+
 function findMatchingPlant(bestScientificName, commonNames = []) {
   return (
     findMatchingPlantByScientificName(bestScientificName) ||
     findMatchingPlantByCommonNames(commonNames) ||
+    findMatchingPlantByGenusAndAlias(bestScientificName, commonNames) ||
     null
   );
 }
