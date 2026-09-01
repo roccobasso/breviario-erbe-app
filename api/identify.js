@@ -12,7 +12,7 @@ export async function POST(request) {
     const incoming = await request.formData();
 
     const image = incoming.get("image") || incoming.get("images");
-    const organ = incoming.get("organ") || incoming.get("organs") || "auto";
+    const organRaw = incoming.get("organ") || incoming.get("organs") || "auto";
 
     if (!image) {
       return Response.json(
@@ -21,9 +21,17 @@ export async function POST(request) {
       );
     }
 
+    const allowedOrgans = ["leaf", "flower", "fruit", "bark", "habit", "auto"];
+    const organ = allowedOrgans.includes(String(organRaw).toLowerCase())
+      ? String(organRaw).toLowerCase()
+      : "auto";
+
     const plantnetForm = new FormData();
     plantnetForm.append("images", image);
-    plantnetForm.append("organs", organ);
+
+    if (organ !== "auto") {
+      plantnetForm.append("organs", organ);
+    }
 
     const url =
       `https://my-api.plantnet.org/v2/identify/all` +
@@ -60,11 +68,12 @@ export async function POST(request) {
           error: "Errore Pl@ntNet",
           details: data
         },
-        { status: plantnetResponse.status }
+        { status: plantnetResponse.status || 500 }
       );
     }
 
-    const best = data?.results?.[0];
+    const results = Array.isArray(data?.results) ? data.results : [];
+    const best = results[0];
 
     if (!best) {
       return Response.json(
@@ -74,10 +83,19 @@ export async function POST(request) {
     }
 
     return Response.json({
-      bestScientificName: best.species?.scientificNameWithoutAuthor || "",
-      score: best.score || 0,
-      commonNames: best.species?.commonNames || [],
-      localMatch: null
+      bestScientificName: best?.species?.scientificNameWithoutAuthor || "",
+      score: typeof best?.score === "number" ? best.score : 0,
+      commonNames: Array.isArray(best?.species?.commonNames)
+        ? best.species.commonNames
+        : [],
+      localMatch: null,
+      results: results.slice(0, 3).map((item) => ({
+        scientificName: item?.species?.scientificNameWithoutAuthor || "",
+        score: typeof item?.score === "number" ? item.score : 0,
+        commonNames: Array.isArray(item?.species?.commonNames)
+          ? item.species.commonNames
+          : []
+      }))
     });
   } catch (error) {
     console.error("Errore API identify:", error);
