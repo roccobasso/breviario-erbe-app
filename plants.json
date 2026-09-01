@@ -1,0 +1,316 @@
+[
+  {
+    "italianName": "Acetosa",
+    "scientificName": "Rumex acetosa L., 1753",
+    "aliases": ["Erba brusca", "Erba cucca"],
+    "family": "Polygonaceae",
+    "biologicalType": "Emicriptofita scaposa, erbacea perenne",
+    "description": "Fusto eretto, cavo e striato, alto 50–100 cm. Foglie basali lanceolate o ovali, verdi intense, con lungo picciolo; quelle superiori sessili. Radice rizomatosa, robusta. Sapore nettamente acidulo delle foglie. Infiorescenza a pannocchia o spiga ramificata. Fiori piccoli, verdastri-rossastri, con 6 tepali.",
+    "habitat": "Prati incolti, pascoli, bordi stradali, terreni argillosi e fertili. Diffusa in tutta Europa e Asia temperata. In Italia cresce spontanea dal livello del mare fino a 2.000 m.",
+    "flowering": "Giugno – agosto",
+    "fruits": "Acheni trigoni, bruni, avvolti dai tepali accrescenti.",
+    "edibleUse": "Foglie giovani consumate crude in insalata, dal gusto acidulo e rinfrescante. Ottime anche cotte in zuppe e minestre primaverili. Da consumare con moderazione per chi soffre di calcoli renali o gotta, per l'alto contenuto di ossalati.",
+    "traditionalRecipes": [
+      "Insalata primaverile con foglie giovani crude, olio extravergine, sale e limone.",
+      "Soupe à l'oseille con foglie, brodo, patate e panna.",
+      "Pesto d'oltralpe con foglie fresche, anacardi e Roquefort.",
+      "Frittata all'acetosa con foglie sbollentate e noce moscata."
+    ],
+    "similarPlants": [
+      "Rumex crispus – romice crespo",
+      "Rumex obtusifolius – romice ottuso",
+      "Rumex scutatus – acetosella di montagna"
+    ],
+    "curiosities": [
+      "Il nome acetosa deriva dal latino acetum, aceto.",
+      "In passato era molto usata contro tosse secca e mal di gola."
+    ],
+    "warnings": [
+      "Contiene ossalati.",
+      "Non abusare in caso di calcoli renali o gotta."
+    ],
+    "category": "alimurgica"
+  },
+  {
+    "italianName": "Agli selvatici",
+    "scientificName": "Allium neapolitanum Cirillo, 1788 / Allium ursinum L., 1753 / Allium triquetrum L., 1753",
+    "aliases": ["Aglio napolitano", "Aglio orsino", "Aglio triquetro"],
+    "family": "Amaryllidaceae",
+    "biologicalType": "Geofite bulbose perenni",
+    "description": "Tre specie affini, alte 20–40 cm, tutte con odore di aglio quando strofinate. Allium triquetrum ha fusto triangolare e fiori campanulati bianchi con venature verdi. Allium neapolitanum ha fiori stellati bianchi. Allium ursinum ha intensa fragranza agliacea.",
+    "habitat": "Zone umide, boschi, margini di fossi e radure. Diffuse soprattutto nelle regioni centro-meridionali d'Italia.",
+    "flowering": "Marzo – maggio",
+    "fruits": "Capsule triloculari con semi neri sferici.",
+    "edibleUse": "Foglie e bulbi usati come sostituto dell'aglio coltivato. Fiori commestibili e decorativi. Tutte le parti sono utilizzabili.",
+    "traditionalRecipes": [
+      "Pesto di aglio selvatico.",
+      "Frittata agli agli selvatici.",
+      "Insalata primaverile con fiori e foglie giovani."
+    ],
+    "similarPlants": [
+      "Convallaria majalis – mughetto",
+      "Paris quadrifolia – uva di volpe"
+    ],
+    "curiosities": [
+      "Allium ursinum prende il nome dall'orso.",
+      "Allium triquetrum è considerata invasiva in molte regioni."
+    ],
+    "warnings": [
+      "L'aglio orsino può essere confuso con il mughetto, mortalmente tossico.",
+      "Verificare sempre l'odore agliaceo prima del consumo."
+    ],
+    "category": "alimurgica"
+  },
+  {
+    "italianName": "Alliaria",
+    "scientificName": "Alliaria petiolata (M. Bieb.) Cavara & Grande, 1913",
+    "aliases": ["Erba aglina"],
+    "family": "Brassicaceae",
+    "biologicalType": "Emicriptofita bienne scaposa",
+    "description": "Fusto eretto fino a 100 cm. Foglie basali cordate o reniformi. Foglie cauline triangolari o rombiche. Se stropicciate emettono un intenso odore agliaceo. Fiori piccoli bianchi in racemo.",
+    "habitat": "Boschi, margini di siepi, ruderi, terreni freschi e ombrosi. Diffusa in tutta Italia.",
+    "flowering": "Aprile – giugno",
+    "fruits": "Silique erette, lunghe 5–6 cm, con semi bruni.",
+    "edibleUse": "Foglie crude o cotte, con sapore agliaceo delicato. Fiori commestibili. Semi talvolta usati come sostituto della senape.",
+    "traditionalRecipes": [
+      "Pesto di alliaria.",
+      "Insalata primaverile in misticanza.",
+      "Salsa verde con foglie tritate."
+    ],
+    "similarPlants": [
+      "Sisymbrium officinale – erisimo",
+      "Capsella bursa-pastoris – borsa del pastore"
+    ],
+    "curiosities": [
+      "Il nome alliaria deriva da allium, aglio.",
+      "Non contiene allicina come l'aglio."
+    ],
+    "warnings": [],
+    "category": "alimurgica"
+  },
+  {
+    "italianName": "Borragine",
+    "scientificName": "Borago officinalis L., 1753",
+    "aliases": ["Boraga", "Vurraina", "Napatara", "Borrana"],
+    "family": "Boraginaceae",
+    "biologicalType": "Terofita scaposa, erbacea annuale",
+    "description": "Pianta alta fino a 60 cm. Fusto eretto, cavo, ramificato, ricoperto da peli rigidi. Foglie grandi e pelose. Fiori azzurro-violetti a forma di stella.",
+    "habitat": "Terreni incolti, bordi stradali, campi coltivati, uliveti. Diffusa in tutta Italia e nel Mediterraneo.",
+    "flowering": "Marzo – luglio",
+    "fruits": "4 acheni scuri, piccoli e rugosi.",
+    "edibleUse": "Le foglie si consumano sempre cotte, mai crude. I fiori sono commestibili crudi.",
+    "traditionalRecipes": [
+      "Foglie fritte in pastella.",
+      "Ripieno per ravioli.",
+      "Frittata di borragine."
+    ],
+    "similarPlants": [
+      "Anchusa azurea – lingua di bue",
+      "Symphytum officinale – consolida maggiore",
+      "Echium vulgare – viperina"
+    ],
+    "curiosities": [
+      "Pianta molto visitata dalle api.",
+      "Era considerata pianta del coraggio."
+    ],
+    "warnings": [
+      "Contiene alcaloidi pirrolizidinici.",
+      "Consumare con moderazione.",
+      "Le foglie vanno mangiate cotte."
+    ],
+    "category": "alimurgica"
+  },
+  {
+    "italianName": "Cicoria di campo",
+    "scientificName": "Cichorium intybus L., 1753",
+    "aliases": [],
+    "family": "Asteraceae",
+    "biologicalType": "Emicriptofita scaposa, erbacea biennale o perenne",
+    "description": "Radice a fittone lunga e ramificata. Fusto eretto, talvolta zigzagante. Foglie basali in rosetta. Al taglio emette lattice bianco. Capolini azzurri intensi.",
+    "habitat": "Specie cosmopolita, diffusa in tutta Italia. Ambienti ruderali, bordi stradali, campi incolti, prati e pascoli.",
+    "flowering": "Luglio – settembre",
+    "fruits": "Acheni di 2–3 mm con pappo corto a squamette.",
+    "edibleUse": "Le foglie basali si raccolgono prima della fioritura. Consumate crude in insalata o lessate e ripassate.",
+    "traditionalRecipes": [
+      "Cicoria strascinata.",
+      "Cicoria e fagioli o ceci.",
+      "Insalata di cicoria cruda.",
+      "Cicoria bollita con pane abbrustolito e olio nuovo."
+    ],
+    "similarPlants": [
+      "Taraxacum officinale – tarassaco",
+      "Sonchus oleraceus – crispigno",
+      "Lactuca serriola – lattugaccio"
+    ],
+    "curiosities": [
+      "I fiori si aprono la mattina e si chiudono nel pomeriggio.",
+      "È pianta mellifera apprezzata."
+    ],
+    "warnings": [],
+    "category": "alimurgica"
+  },
+  {
+    "italianName": "Ortica",
+    "scientificName": "Urtica dioica L., 1753",
+    "aliases": ["Urtiga"],
+    "family": "Urticaceae",
+    "biologicalType": "Emicriptofita scaposa, erbacea perenne rizomatosa",
+    "description": "Pianta alta 50–150 cm, con peli urticanti su fusto e foglie. Foglie opposte, dentate, verde scuro. Infiorescenze pendule verdastre.",
+    "habitat": "Terreni umidi e ricchi di azoto, fossi, siepi, campi abbandonati. Diffusa in Europa.",
+    "flowering": "Giugno – settembre",
+    "fruits": "Piccoli acheni ovali.",
+    "edibleUse": "Le foglie giovani si raccolgono con guanti. La cottura elimina completamente l'urticanza.",
+    "traditionalRecipes": [
+      "Minestra di ortiche.",
+      "Risotto alle ortiche.",
+      "Frittata di ortiche.",
+      "Pasta verde alle ortiche."
+    ],
+    "similarPlants": [
+      "Urtica urens – ortica minore",
+      "Lamium album – falsa ortica",
+      "Parietaria officinalis – pannatara"
+    ],
+    "curiosities": [
+      "Un tempo le fibre del fusto si usavano per tessuti.",
+      "È tra le piante spontanee più nutrienti."
+    ],
+    "warnings": [
+      "Raccogliere sempre con guanti."
+    ],
+    "category": "alimurgica"
+  },
+  {
+    "italianName": "Achillea",
+    "scientificName": "Achillea millefolium",
+    "aliases": ["Stagnasangue", "Millefoglio"],
+    "family": "Asteraceae",
+    "biologicalType": "Erbacea perenne",
+    "description": "Fusto eretto, foglie finemente frastagliate, aromatiche. Infiorescenze a capolini con fiori bianchi o rosati.",
+    "habitat": "Prati, sentieri, campi incolti e zone collinari. Diffusa in Italia.",
+    "flowering": "Maggio – settembre",
+    "fruits": "Achenio oblungo, senza pappo.",
+    "medicinalUse": "Proprietà cicatrizzanti, emostatiche, antinfiammatorie, digestive e antispasmodiche. Usata in infusi e preparati per pelle sensibile.",
+    "traditionalUses": [
+      "Infusi contro problemi digestivi e mestruali.",
+      "Uso cosmetico per la pelle sensibile."
+    ],
+    "similarPlants": [],
+    "curiosities": [
+      "Il nome deriva da Achille.",
+      "Pianta mellifera molto apprezzata."
+    ],
+    "warnings": [],
+    "category": "officinale"
+  },
+  {
+    "italianName": "Melissa",
+    "scientificName": "Melissa officinalis L., 1753",
+    "aliases": ["Cedronella", "Limoncina"],
+    "family": "Lamiaceae",
+    "biologicalType": "Emicriptofita scaposa, erbacea perenne",
+    "description": "Fusto quadrangolare e pubescente. Foglie ovate e dentate, con intenso profumo di limone. Fiori piccoli bianco-rosati.",
+    "habitat": "Boschi aperti, radure, siepi e bordi stradali. Assai diffusa in Europa.",
+    "flowering": "Maggio – agosto",
+    "fruits": "Tetracheni con quattro mericarpi lisci e bruni.",
+    "medicinalUse": "Proprietà rilassanti, digestive e antispasmodiche. Usata per ansia, insonnia e disturbi digestivi.",
+    "traditionalUses": [
+      "Tisane serali rilassanti.",
+      "Aromatica per piatti delicati."
+    ],
+    "similarPlants": [
+      "Mentha x piperita – menta piperita",
+      "Aloysia citrodora – verbena odorosa"
+    ],
+    "curiosities": [
+      "Il nome Melissa richiama le api.",
+      "È una delle aromatiche più coltivate negli orti europei."
+    ],
+    "warnings": [],
+    "category": "officinale"
+  },
+  {
+    "italianName": "Erba di San Giovanni",
+    "scientificName": "Hypericum perforatum L., 1753",
+    "aliases": ["Iperico", "Scacciadiavoli", "Pilatro"],
+    "family": "Hypericaceae",
+    "biologicalType": "Camefita suffruticosa, perenne semi-sempreverde",
+    "description": "Fusto con due strisce in rilievo. Foglie opposte che in controluce sembrano bucate. Fiori giallo oro con ghiandole contenenti olio rosso.",
+    "habitat": "Terreni asciutti, campi abbandonati e ambienti ruderali. Diffuso in tutta Italia.",
+    "flowering": "Intorno al 24 giugno",
+    "fruits": "Capsule con numerosi semi piccoli.",
+    "medicinalUse": "Nota per proprietà antidepressive e antivirali. Oleolito usato per ustioni, ferite e infiammazioni cutanee.",
+    "traditionalUses": [
+      "Uso per ansia e depressione lieve.",
+      "Olio rosso per uso esterno."
+    ],
+    "similarPlants": [
+      "Hypericum hirsutum",
+      "Hypericum montanum",
+      "Hypericum tetrapterum"
+    ],
+    "curiosities": [
+      "Si raccoglie tradizionalmente attorno al 24 giugno.",
+      "È una delle piante medicinali più studiate."
+    ],
+    "warnings": [
+      "Può interagire con molti farmaci.",
+      "Può causare fotosensibilizzazione.",
+      "Consultare un medico prima dell'uso interno."
+    ],
+    "category": "officinale"
+  },
+  {
+    "italianName": "Cicuta",
+    "scientificName": "Conium maculatum L., 1753",
+    "aliases": ["Cicuta maggiore", "Erba di Socrate"],
+    "family": "Apiaceae",
+    "biologicalType": "",
+    "description": "Pianta erbacea biennale alta 1–2,5 metri. Fusto cavo con macchie porpora. Foglie grandi e finemente divise. Odore sgradevole di topo.",
+    "habitat": "Fossi, ruderi, margini stradali, terreni umidi e ricchi di nutrienti. Molto comune in Italia.",
+    "flowering": "Maggio – agosto",
+    "fruits": "Diacheni piccoli, ovoidi, con coste evidenti.",
+    "toxicity": "Pianta estremamente velenosa in tutte le sue parti. L'ingestione provoca grave neurotossicità e possibile arresto respiratorio.",
+    "traditionalUses": [
+      "Storicamente nota come veleno usato per l'esecuzione di Socrate."
+    ],
+    "similarPlants": [
+      "Daucus carota – carota selvatica",
+      "Anthriscus spp.",
+      "Specie commestibili delle Apiaceae"
+    ],
+    "curiosities": [
+      "Le macchie porpora sul fusto sono un segno distintivo importante."
+    ],
+    "warnings": [
+      "Specie mortale.",
+      "Non raccogliere mai per uso alimentare.",
+      "Può essere confusa con Apiaceae commestibili."
+    ],
+    "category": "velenosa"
+  },
+  {
+    "italianName": "Belladonna",
+    "scientificName": "Atropa belladonna L., 1753",
+    "aliases": [],
+    "family": "Solanaceae",
+    "biologicalType": "",
+    "description": "Pianta erbacea perenne alta 50–150 cm. Foglie grandi ovate. Fiori campanulati porpora-brunastri. Bacche nere lucide molto attraenti.",
+    "habitat": "Boschi montani, radure e margini ombrosi. Presente in Italia soprattutto in zone montane e collinari.",
+    "flowering": "Giugno – settembre",
+    "fruits": "Bacche globose nere lucide, molto pericolose.",
+    "toxicity": "Pianta estremamente velenosa in tutte le sue parti, soprattutto bacche e radice. Contiene atropina, scopolamina e iosciamina.",
+    "traditionalUses": [
+      "In passato usata in cosmetica e in medicina controllata."
+    ],
+    "similarPlants": [],
+    "curiosities": [
+      "Il nome Atropa richiama Atropo, una delle Moire."
+    ],
+    "warnings": [
+      "Le bacche sono letali e attirano i bambini.",
+      "Non toccare o usare senza competenze specialistiche."
+    ],
+    "category": "velenosa"
+  }
+]
