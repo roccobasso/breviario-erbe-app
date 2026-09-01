@@ -1,53 +1,78 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Metodo non consentito" });
-  }
-
+export async function POST(request) {
   try {
     const apiKey = process.env.PLANTNET_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: "Chiave API mancante su Vercel" });
+      return Response.json(
+        { error: "Chiave API Pl@ntNet mancante su Vercel." },
+        { status: 500 }
+      );
     }
 
-    const form = req.body;
+    const incoming = await request.formData();
 
-    const response = await fetch(`https://my-api.plantnet.org/v2/identify/all?api-key=${apiKey}&lang=it&include-related-images=false&no-reject=true&nb-results=3`, {
+    // accetta sia "image" che "images"
+    const image =
+      incoming.get("image") || incoming.get("images");
+    const organ = incoming.get("organ") || incoming.get("organs") || "auto";
+
+    if (!image) {
+      return Response.json(
+        { error: "Nessuna immagine ricevuta." },
+        { status: 400 }
+      );
+    }
+
+    const plantnetForm = new FormData();
+    plantnetForm.append("images", image);
+    plantnetForm.append("organs", organ);
+
+    const url =
+      `https://my-api.plantnet.org/v2/identify/all` +
+      `?api-key=${encodeURIComponent(apiKey)}` +
+      `&lang=it` +
+      `&include-related-images=false` +
+      `&no-reject=true` +
+      `&nb-results=3`;
+
+    const plantnetResponse = await fetch(url, {
       method: "POST",
-      body: form
+      body: plantnetForm
     });
 
-    const data = await response.json();
+    const data = await plantnetResponse.json();
 
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: "Errore Pl@ntNet",
-        details: data
-      });
+    if (!plantnetResponse.ok) {
+      return Response.json(
+        {
+          error: "Errore Pl@ntNet",
+          details: data
+        },
+        { status: plantnetResponse.status }
+      );
     }
 
     const best = data.results && data.results[0];
 
     if (!best) {
-      return res.status(200).json({
-        error: "Nessun risultato trovato"
+      return Response.json({
+        error: "Nessun risultato trovato da Pl@ntNet."
       });
     }
 
-    return res.status(200).json({
-      bestScientificName: best.species.scientificNameWithoutAuthor,
-      score: best.score,
+    return Response.json({
+      bestScientificName: best.species?.scientificNameWithoutAuthor || "",
+      score: best.score || 0,
+      commonNames: best.species?.commonNames || [],
       localMatch: null
     });
   } catch (error) {
-    return res.status(500).json({
-      error: "Errore interno del server"
-    });
+    return Response.json(
+      {
+        error: "Errore interno del server",
+        details: error instanceof Error ? error.message : String(error)
+      },
+      { status: 500 }
+    );
   }
 }
-
-export const config = {
-  api: {
-    bodyParser: false
-  }
-};
