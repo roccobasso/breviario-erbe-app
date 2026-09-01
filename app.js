@@ -41,6 +41,14 @@ function extractScientificCandidates(value) {
     .filter(Boolean);
 }
 
+function splitAliases(value) {
+  return (value || "")
+    .toString()
+    .split(/[,;/|]/g)
+    .map((item) => normalizeText(item))
+    .filter(Boolean);
+}
+
 function getEl(...ids) {
   for (const id of ids) {
     const el = document.getElementById(id);
@@ -130,6 +138,7 @@ function debugTablePlants(limit = 15) {
       index: i,
       italianName: getPlantItalianName(p),
       scientificName: getPlantScientificName(p),
+      aliases: getPlantAliases(p),
       normalizedScientific: extractScientificCandidates(getPlantScientificName(p)).join(" | ")
     }));
     console.table(rows);
@@ -336,10 +345,10 @@ function showPlantDetail(plant) {
 }
 
 /* =========================
-   MATCH NOME SCIENTIFICO
+   MATCH PIANTA
 ========================= */
 
-function findMatchingPlant(bestScientificName) {
+function findMatchingPlantByScientificName(bestScientificName) {
   const resultScientific = stripAuthorFromScientificName(bestScientificName);
 
   if (!resultScientific) return null;
@@ -365,7 +374,7 @@ function findMatchingPlant(bestScientificName) {
     });
 
     if (isMatch) {
-      debugLog("MATCH TROVATO:", {
+      debugLog("MATCH SCIENTIFICO TROVATO:", {
         italianName: getPlantItalianName(plant),
         rawScientific,
         candidates,
@@ -375,13 +384,60 @@ function findMatchingPlant(bestScientificName) {
     }
   }
 
-  debugLog("Nessun match trovato.");
-  debugLog(
-    "Primi 20 nomi scientifici archivio:",
-    allPlants.slice(0, 20).map(p => getPlantScientificName(p))
-  );
+  return null;
+}
+
+function findMatchingPlantByCommonNames(commonNames = []) {
+  const normalizedCommonNames = (Array.isArray(commonNames) ? commonNames : [])
+    .map((name) => normalizeText(name))
+    .filter(Boolean);
+
+  if (!normalizedCommonNames.length) return null;
+
+  debugLog("Tentativo match con nomi comuni:", normalizedCommonNames);
+
+  for (const plant of allPlants) {
+    const italianName = normalizeText(getPlantItalianName(plant));
+    const aliases = splitAliases(getPlantAliases(plant));
+    const scientificRaw = normalizeText(getPlantScientificName(plant));
+
+    const matched = normalizedCommonNames.some((commonName) => {
+      if (!commonName) return false;
+
+      if (italianName === commonName || italianName.includes(commonName) || commonName.includes(italianName)) {
+        return true;
+      }
+
+      if (aliases.some(alias => alias === commonName || alias.includes(commonName) || commonName.includes(alias))) {
+        return true;
+      }
+
+      if (scientificRaw.includes(commonName) || commonName.includes(scientificRaw)) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (matched) {
+      debugLog("MATCH PER NOME COMUNE TROVATO:", {
+        italianName: getPlantItalianName(plant),
+        aliases: getPlantAliases(plant),
+        scientificName: getPlantScientificName(plant)
+      });
+      return plant;
+    }
+  }
 
   return null;
+}
+
+function findMatchingPlant(bestScientificName, commonNames = []) {
+  return (
+    findMatchingPlantByScientificName(bestScientificName) ||
+    findMatchingPlantByCommonNames(commonNames) ||
+    null
+  );
 }
 
 /* =========================
@@ -512,7 +568,10 @@ async function identifyPlant() {
       html += `<p><strong>Affidabilità:</strong> ${(data.score * 100).toFixed(1)}%</p>`;
     }
 
-    const matchedPlant = findMatchingPlant(data.bestScientificName);
+    const matchedPlant = findMatchingPlant(
+      data.bestScientificName,
+      Array.isArray(data.commonNames) ? data.commonNames : []
+    );
 
     debugLog("Nome normalizzato:", stripAuthorFromScientificName(data.bestScientificName));
     debugLog(
