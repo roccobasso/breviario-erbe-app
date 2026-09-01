@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Breviario di un cercatore di erbe</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <h1>Breviario di un cercatore di erbe</h1>
+      <p>Piante alimurgiche, officinali e velenose del Centro Italia</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="notice">
+      <strong>Avvertenza:</strong>
+      non consumare piante basandoti solo su foto o somiglianze.
+    </section>
+
+    <section class="controls">
+      <input id="searchInput" type="text" placeholder="Cerca una pianta..." />
+      <select id="categoryFilter">
+        <option value="">Tutte le categorie</option>
+        <option value="alimurgica">Alimurgiche</option>
+        <option value="officinale">Officinali</option>
+        <option value="velenosa">Velenose</option>
+      </select>
+    </section>
+
+    <section class="upload-box">
+      <h2>Riconosci una pianta da foto</h2>
+      <input id="photoInput" type="file" accept="image/*" />
+      <select id="organInput">
+        <option value="auto">Auto</option>
+        <option value="leaf">Foglia</option>
+        <option value="flower">Fiore</option>
+        <option value="fruit">Frutto</option>
+        <option value="bark">Corteccia</option>
+      </select>
+      <button id="identifyBtn">Identifica</button>
+      <div id="identifyResult" class="result-box"></div>
+    </section>
+
+    <section id="stats" class="stats"></section>
+    <section id="plantList" class="grid"></section>
+    <section id="plantDetail" class="detail hidden"></section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
