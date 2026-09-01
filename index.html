@@ -11,7 +11,7 @@
     <div class="container">
       <h1>Breviario di un cercatore di erbe</h1>
       <p>Piante alimurgiche, officinali e velenose del Centro Italia</p>
-      <p className="author">di Paolo Arice</p>
+      <p class="author">di Paolo Arice</p>
     </div>
   </header>
 
@@ -34,18 +34,18 @@
     <section class="upload-box">
       <h2>Riconosci una pianta da foto</h2>
       <input id="photoInput" type="file" accept="image/*" />
-      <select id="organInput">
+      <select id="identifyOrgan">
         <option value="auto">Auto</option>
         <option value="leaf">Foglia</option>
         <option value="flower">Fiore</option>
         <option value="fruit">Frutto</option>
         <option value="bark">Corteccia</option>
       </select>
-      <button id="identifyBtn">Identifica</button>
+      <button id="identifyBtn" type="button">Identifica</button>
       <div id="identifyResult" class="result-box"></div>
     </section>
 
-    <section id="stats" class="stats"></section>
+    <section id="resultsCount" class="stats"></section>
     <section id="plantList" class="grid"></section>
     <section id="plantDetail" class="detail hidden"></section>
   </main>
