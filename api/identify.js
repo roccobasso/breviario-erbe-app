@@ -11,9 +11,7 @@ export async function POST(request) {
 
     const incoming = await request.formData();
 
-    // accetta sia "image" che "images"
-    const image =
-      incoming.get("image") || incoming.get("images");
+    const image = incoming.get("image") || incoming.get("images");
     const organ = incoming.get("organ") || incoming.get("organs") || "auto";
 
     if (!image) {
@@ -40,7 +38,21 @@ export async function POST(request) {
       body: plantnetForm
     });
 
-    const data = await plantnetResponse.json();
+    let data;
+    const contentType = plantnetResponse.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+      data = await plantnetResponse.json();
+    } else {
+      const text = await plantnetResponse.text();
+      return Response.json(
+        {
+          error: "Risposta non valida da Pl@ntNet",
+          details: text || "Risposta vuota"
+        },
+        { status: plantnetResponse.status || 500 }
+      );
+    }
 
     if (!plantnetResponse.ok) {
       return Response.json(
@@ -52,12 +64,13 @@ export async function POST(request) {
       );
     }
 
-    const best = data.results && data.results[0];
+    const best = data?.results?.[0];
 
     if (!best) {
-      return Response.json({
-        error: "Nessun risultato trovato da Pl@ntNet."
-      });
+      return Response.json(
+        { error: "Nessun risultato trovato da Pl@ntNet." },
+        { status: 200 }
+      );
     }
 
     return Response.json({
@@ -67,6 +80,8 @@ export async function POST(request) {
       localMatch: null
     });
   } catch (error) {
+    console.error("Errore API identify:", error);
+
     return Response.json(
       {
         error: "Errore interno del server",
