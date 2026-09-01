@@ -372,6 +372,55 @@ function findMatchingPlant(bestScientificName) {
    IDENTIFICAZIONE PIANTA
 ========================= */
 
+async function resizeImage(file, maxSize = 1280, quality = 0.8) {
+  const img = new Image();
+  const reader = new FileReader();
+
+  const imageLoaded = new Promise((resolve, reject) => {
+    reader.onload = (e) => {
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    img.onload = resolve;
+    img.onerror = reject;
+  });
+
+  reader.readAsDataURL(file);
+  await imageLoaded;
+
+  let width = img.width;
+  let height = img.height;
+
+  if (width > height) {
+    if (width > maxSize) {
+      height = Math.round((height * maxSize) / width);
+      width = maxSize;
+    }
+  } else {
+    if (height > maxSize) {
+      width = Math.round((width * maxSize) / height);
+      height = maxSize;
+    }
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, width, height);
+
+  const blob = await new Promise((resolve) => {
+    canvas.toBlob(resolve, "image/jpeg", quality);
+  });
+
+  if (!blob) {
+    throw new Error("Impossibile ridurre l'immagine.");
+  }
+
+  return new File([blob], "foto-ridotta.jpg", { type: "image/jpeg" });
+}
+
 async function identifyPlant() {
   if (!identifyImageInput || !identifyImageInput.files || !identifyImageInput.files[0]) {
     if (identifyResultBox) {
