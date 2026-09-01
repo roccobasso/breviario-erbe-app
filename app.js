@@ -128,6 +128,58 @@ function getPlantAliases(plant) {
   );
 }
 
+function getPlantFamily(plant) {
+  return plant.family || plant.famiglia || "";
+}
+
+function getPlantBiologicalType(plant) {
+  return plant.biologicalType || plant.tipoBiologico || "";
+}
+
+function getPlantFlowering(plant) {
+  return plant.flowering || plant.fioritura || "";
+}
+
+function getPlantFruits(plant) {
+  return plant.fruits || plant.frutti || "";
+}
+
+function getPlantFoodUse(plant) {
+  return plant.foodUse || plant.usoAlimentare || "";
+}
+
+function getPlantMedicinalUse(plant) {
+  return plant.medicinalUse || plant.usoOfficinale || "";
+}
+
+function getPlantToxicity(plant) {
+  return plant.toxicity || plant.tossicita || "";
+}
+
+function getPlantRecipes(plant) {
+  return plant.recipes || plant.ricetteTradizionali || "";
+}
+
+function getPlantSimilar(plant) {
+  return plant.similarPlants || plant.pianteSimili || "";
+}
+
+function getPlantCuriosity(plant) {
+  return plant.curiosity || plant.curiosita || "";
+}
+
+function uniqueBy(array, keyFn) {
+  const seen = new Set();
+  const out = [];
+  for (const item of array) {
+    const key = keyFn(item);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
+}
+
 /* =========================
    ELEMENTI PAGINA
 ========================= */
@@ -139,7 +191,7 @@ const detailBox = getEl("plantDetail", "detailBox", "details", "schedaDettaglio"
 
 const identifyButton = getEl("identifyBtn", "identifyButton");
 const identifyImageInput = getEl("identifyImage", "imageInput", "photoInput", "plant-image");
-const identifyOrganSelect = getEl("identifyOrgan", "organSelect", "organ-select");
+const identifyOrganSelect = getEl("identifyOrgan", "organSelect", "organ-select", "organInput");
 const identifyResultBox = getEl("identifyResult", "resultBox", "identifyOutput");
 
 /* =========================
@@ -171,7 +223,7 @@ function debugTablePlants(limit = 15) {
 
 async function loadPlants() {
   try {
-    const res = await fetch("plants.json");
+    const res = await fetch("plants.json", { cache: "no-store" });
     if (!res.ok) {
       throw new Error("Impossibile caricare plants.json");
     }
@@ -235,12 +287,14 @@ function filterPlants() {
     const scientificName = normalizeText(getPlantScientificName(plant));
     const aliases = normalizeText(getPlantAliases(plant));
     const category = getPlantCategory(plant);
+    const description = normalizeText(getPlantDescription(plant));
 
     const matchesText =
       !query ||
       italianName.includes(query) ||
       scientificName.includes(query) ||
-      aliases.includes(query);
+      aliases.includes(query) ||
+      description.includes(query);
 
     const matchesCategory =
       !selectedCategory || category === selectedCategory;
@@ -258,7 +312,7 @@ function filterPlants() {
 function renderPlants(plants) {
   if (!plantList) return;
 
-  const counter = getEl("resultsCount", "plantsCount", "countBox");
+  const counter = getEl("resultsCount", "plantsCount", "countBox", "stats");
   if (counter) {
     counter.textContent = `Schede trovate: ${plants.length}`;
   }
@@ -282,8 +336,8 @@ function renderPlants(plants) {
         <h3>${escapeHtml(getPlantItalianName(plant))}</h3>
         <p><em>${escapeHtml(getPlantScientificName(plant))}</em></p>
         ${
-          plant.family || plant.famiglia
-            ? `<p><strong>Famiglia:</strong> ${escapeHtml(plant.family || plant.famiglia)}</p>`
+          getPlantFamily(plant)
+            ? `<p><strong>Famiglia:</strong> ${escapeHtml(getPlantFamily(plant))}</p>`
             : ""
         }
         ${
@@ -331,21 +385,21 @@ function showPlantDetail(plant) {
 
       ${fieldHtml("Categoria", plant.category || plant.categoria)}
       ${fieldHtml("Detto/a anche", getPlantAliases(plant))}
-      ${fieldHtml("Famiglia", plant.family || plant.famiglia)}
-      ${fieldHtml("Tipo biologico", plant.biologicalType || plant.tipoBiologico)}
-      ${fieldHtml("Descrizione", plant.description || plant.descrizione)}
+      ${fieldHtml("Famiglia", getPlantFamily(plant))}
+      ${fieldHtml("Tipo biologico", getPlantBiologicalType(plant))}
+      ${fieldHtml("Descrizione", getPlantDescription(plant))}
       ${fieldHtml("Habitat", plant.habitat)}
-      ${fieldHtml("Fioritura", plant.flowering || plant.fioritura)}
-      ${fieldHtml("Frutti", plant.fruits || plant.frutti)}
-      ${fieldHtml("Uso alimentare", plant.foodUse || plant.usoAlimentare)}
-      ${fieldHtml("Uso officinale", plant.medicinalUse || plant.usoOfficinale)}
-      ${fieldHtml("Tossicità", plant.toxicity || plant.tossicita)}
-      ${fieldHtml("Ricette tradizionali", plant.recipes || plant.ricetteTradizionali)}
-      ${fieldHtml("Piante simili", plant.similarPlants || plant.pianteSimili)}
-      ${fieldHtml("Curiosità", plant.curiosity || plant.curiosita)}
+      ${fieldHtml("Fioritura", getPlantFlowering(plant))}
+      ${fieldHtml("Frutti", getPlantFruits(plant))}
+      ${fieldHtml("Uso alimentare", getPlantFoodUse(plant))}
+      ${fieldHtml("Uso officinale", getPlantMedicinalUse(plant))}
+      ${fieldHtml("Tossicità", getPlantToxicity(plant))}
+      ${fieldHtml("Ricette tradizionali", getPlantRecipes(plant))}
+      ${fieldHtml("Piante simili", getPlantSimilar(plant))}
+      ${fieldHtml("Curiosità", getPlantCuriosity(plant))}
 
       <div style="margin-top:16px;">
-        <button id="closeDetailBtn">Chiudi</button>
+        <button id="closeDetailBtn" type="button">Chiudi</button>
       </div>
     </div>
   `;
@@ -497,8 +551,146 @@ function findMatchingPlant(bestScientificName, commonNames = []) {
 }
 
 /* =========================
+   IDENTIFICAZIONE ASSISTITA
+========================= */
+
+function findPlantByItalianName(name) {
+  const target = normalizeText(name);
+  return allPlants.find((p) => normalizeText(getPlantItalianName(p)) === target) || null;
+}
+
+function isLappolinaPlant(plant) {
+  return normalizeText(getPlantItalianName(plant)) === "lappolina";
+}
+
+function isErbaStellaPlant(plant) {
+  return normalizeText(getPlantItalianName(plant)) === "erba stella";
+}
+
+function buildAmbiguousLappolinaMessage(primaryPlant, secondaryPlant, score) {
+  const scoreHtml =
+    typeof score === "number"
+      ? `<p><strong>Affidabilità del servizio:</strong> ${(score * 100).toFixed(1)}%</p>`
+      : "";
+
+  return `
+    <h3>Risultato da verificare</h3>
+    ${scoreHtml}
+    <p>
+      Il riconoscimento automatico può confondere <strong>Lappolina</strong> e <strong>Erba stella</strong>.
+    </p>
+    <p><strong>Candidati plausibili:</strong></p>
+    <ol>
+      <li>
+        <strong>${escapeHtml(getPlantItalianName(primaryPlant))}</strong>
+        <em>${escapeHtml(getPlantScientificName(primaryPlant))}</em>
+      </li>
+      <li>
+        <strong>${escapeHtml(getPlantItalianName(secondaryPlant))}</strong>
+        <em>${escapeHtml(getPlantScientificName(secondaryPlant))}</em>
+      </li>
+    </ol>
+    <p><strong>Controllo chiave:</strong></p>
+    <ul>
+      <li><strong>Lappolina</strong>: pianta più <strong>prostrata/tappezzante</strong>, rami aderenti al terreno.</li>
+      <li><strong>Erba stella</strong>: più da <strong>rosetta basale</strong>, con <strong>spighe erette</strong>.</li>
+    </ul>
+    <p>
+      Dalla foto tipica che hai mostrato, se la pianta è distesa a raggiera sul suolo, va favorito <strong>Lappolina</strong>.
+    </p>
+  `;
+}
+
+function scoreLocalPlantForFallback(plant) {
+  const text = normalizeText([
+    getPlantItalianName(plant),
+    getPlantScientificName(plant),
+    getPlantAliases(plant),
+    getPlantDescription(plant),
+    plant.habitat || "",
+    getPlantSimilar(plant)
+  ].join(" "));
+
+  let score = 0;
+
+  if (text.includes("prostrato")) score += 4;
+  if (text.includes("tappezzante")) score += 5;
+  if (text.includes("aderente al terreno")) score += 5;
+  if (text.includes("rosetta")) score += 2;
+  if (text.includes("foglie profondamente incise")) score += 2;
+  if (text.includes("spighe cilindriche erette")) score -= 1;
+
+  if (isLappolinaPlant(plant)) score += 3;
+  if (isErbaStellaPlant(plant)) score += 2;
+
+  return score;
+}
+
+function getFallbackCandidates() {
+  const scored = allPlants
+    .map((plant) => ({ plant, score: scoreLocalPlantForFallback(plant) }))
+    .sort((a, b) => b.score - a.score);
+
+  return scored.filter((x) => x.score > 0).slice(0, 5);
+}
+
+function renderFallbackCandidates() {
+  const candidates = getFallbackCandidates();
+  const lappolina = findPlantByItalianName("Lappolina");
+  const erbaStella = findPlantByItalianName("Erba stella");
+
+  if (lappolina && erbaStella && identifyResultBox) {
+    identifyResultBox.innerHTML = buildAmbiguousLappolinaMessage(lappolina, erbaStella);
+    return;
+  }
+
+  if (!identifyResultBox) return;
+
+  if (!candidates.length) {
+    identifyResultBox.innerHTML = `
+      <p style="color:#b00020;">
+        Identificazione automatica non disponibile o non affidabile.
+      </p>
+    `;
+    return;
+  }
+
+  identifyResultBox.innerHTML = `
+    <h3>Identificazione prudente</h3>
+    <p>Il servizio automatico non ha restituito un risultato affidabile. Possibili candidati:</p>
+    <ol>
+      ${candidates.slice(0, 3).map(({ plant }) => `
+        <li>
+          <strong>${escapeHtml(getPlantItalianName(plant))}</strong>
+          <em>${escapeHtml(getPlantScientificName(plant))}</em>
+        </li>
+      `).join("")}
+    </ol>
+  `;
+}
+
+/* =========================
    IDENTIFICAZIONE PIANTA
 ========================= */
+
+function normalizeOrganValue(rawValue) {
+  const value = normalizeText(rawValue || "auto");
+
+  const mapping = {
+    auto: "auto",
+    leaf: "leaf",
+    foglia: "leaf",
+    leaves: "leaf",
+    flower: "flower",
+    fiore: "flower",
+    fruit: "fruit",
+    frutto: "fruit",
+    bark: "bark",
+    corteccia: "bark"
+  };
+
+  return mapping[value] || "auto";
+}
 
 async function resizeImage(file, maxSize = 1400, quality = 0.82) {
   const objectUrl = URL.createObjectURL(file);
@@ -558,6 +750,95 @@ async function resizeImage(file, maxSize = 1400, quality = 0.82) {
   }
 }
 
+function parseIdentifyResponse(data) {
+  if (!data || typeof data !== "object") return null;
+
+  const bestScientificName =
+    data.bestScientificName ||
+    data.bestScientific ||
+    data.scientificName ||
+    data.bestMatch?.scientificName ||
+    "";
+
+  const commonNames = Array.isArray(data.commonNames)
+    ? data.commonNames
+    : Array.isArray(data.common_names)
+    ? data.common_names
+    : [];
+
+  const score =
+    typeof data.score === "number"
+      ? data.score
+      : typeof data.confidence === "number"
+      ? data.confidence
+      : null;
+
+  return {
+    bestScientificName,
+    commonNames,
+    score,
+    raw: data
+  };
+}
+
+function maybeHandleLappolinaErbaStellaAmbiguity(parsed, matchedPlant) {
+  const lappolina = findPlantByItalianName("Lappolina");
+  const erbaStella = findPlantByItalianName("Erba stella");
+
+  if (!lappolina || !erbaStella) return false;
+  if (!matchedPlant) return false;
+
+  const normalizedMatched = normalizeText(getPlantItalianName(matchedPlant));
+  const commonNamesText = normalizeText((parsed.commonNames || []).join(" "));
+  const scientificText = normalizeText(parsed.bestScientificName || "");
+  const lowConfidence = typeof parsed.score !== "number" || parsed.score < 0.82;
+
+  const mentionsPlantago =
+    scientificText.includes("plantago coronopus") ||
+    commonNamesText.includes("minutina") ||
+    commonNamesText.includes("corno di cervo");
+
+  const mentionsCoronopus =
+    scientificText.includes("coronopus") ||
+    commonNamesText.includes("zampa di gallo") ||
+    commonNamesText.includes("erba cornuta");
+
+  if (normalizedMatched === "erba stella" && lowConfidence) {
+    if (identifyResultBox) {
+      identifyResultBox.innerHTML = buildAmbiguousLappolinaMessage(
+        erbaStella,
+        lappolina,
+        parsed.score
+      );
+    }
+    return true;
+  }
+
+  if (normalizedMatched === "lappolina" && lowConfidence) {
+    if (identifyResultBox) {
+      identifyResultBox.innerHTML = buildAmbiguousLappolinaMessage(
+        lappolina,
+        erbaStella,
+        parsed.score
+      );
+    }
+    return true;
+  }
+
+  if ((mentionsPlantago || mentionsCoronopus) && lowConfidence) {
+    if (identifyResultBox) {
+      identifyResultBox.innerHTML = buildAmbiguousLappolinaMessage(
+        lappolina,
+        erbaStella,
+        parsed.score
+      );
+    }
+    return true;
+  }
+
+  return false;
+}
+
 async function identifyPlant() {
   if (!identifyImageInput || !identifyImageInput.files || !identifyImageInput.files[0]) {
     if (identifyResultBox) {
@@ -569,7 +850,7 @@ async function identifyPlant() {
   }
 
   const originalFile = identifyImageInput.files[0];
-  const organValue = identifyOrganSelect?.value || "auto";
+  const organValue = normalizeOrganValue(identifyOrganSelect?.value || "auto");
 
   if (identifyResultBox) {
     identifyResultBox.innerHTML = `<p>Identificazione in corso...</p>`;
@@ -594,8 +875,8 @@ async function identifyPlant() {
       body: formData
     });
 
-    let data;
     const contentType = res.headers.get("content-type") || "";
+    let data;
 
     if (contentType.includes("application/json")) {
       data = await res.json();
@@ -610,32 +891,43 @@ async function identifyPlant() {
       throw new Error(data?.error || "Errore durante l'identificazione");
     }
 
+    const parsed = parseIdentifyResponse(data);
+
+    if (!parsed || !parsed.bestScientificName) {
+      renderFallbackCandidates();
+      return;
+    }
+
     let html = `<h3>Risultato Pl@ntNet</h3>`;
 
-    if (data.bestScientificName) {
-      html += `<p><strong>Nome scientifico:</strong> ${escapeHtml(data.bestScientificName)}</p>`;
+    if (parsed.bestScientificName) {
+      html += `<p><strong>Nome scientifico:</strong> ${escapeHtml(parsed.bestScientificName)}</p>`;
     }
 
-    if (Array.isArray(data.commonNames) && data.commonNames.length) {
-      html += `<p><strong>Nomi comuni:</strong> ${escapeHtml(data.commonNames.join(", "))}</p>`;
+    if (Array.isArray(parsed.commonNames) && parsed.commonNames.length) {
+      html += `<p><strong>Nomi comuni:</strong> ${escapeHtml(parsed.commonNames.join(", "))}</p>`;
     }
 
-    if (typeof data.score === "number") {
-      html += `<p><strong>Affidabilità:</strong> ${(data.score * 100).toFixed(1)}%</p>`;
+    if (typeof parsed.score === "number") {
+      html += `<p><strong>Affidabilità:</strong> ${(parsed.score * 100).toFixed(1)}%</p>`;
     }
 
     const matchedPlant = findMatchingPlant(
-      data.bestScientificName,
-      Array.isArray(data.commonNames) ? data.commonNames : []
+      parsed.bestScientificName,
+      Array.isArray(parsed.commonNames) ? parsed.commonNames : []
     );
 
-    debugLog("Nome normalizzato:", stripAuthorFromScientificName(data.bestScientificName));
+    debugLog("Nome normalizzato:", stripAuthorFromScientificName(parsed.bestScientificName));
     debugLog(
       "Primi nomi scientifici archivio:",
       allPlants.slice(0, 10).map(p => getPlantScientificName(p))
     );
 
     if (matchedPlant) {
+      if (maybeHandleLappolinaErbaStellaAmbiguity(parsed, matchedPlant)) {
+        return;
+      }
+
       html += `<p><strong>Scheda trovata nel tuo archivio:</strong> ${escapeHtml(getPlantItalianName(matchedPlant))}</p>`;
 
       if (identifyResultBox) {
@@ -654,10 +946,32 @@ async function identifyPlant() {
   } catch (error) {
     console.error(error);
 
+    const message = error?.message || "Errore sconosciuto";
+    const normalizedMessage = normalizeText(message);
+
+    const isPatternError =
+      normalizedMessage.includes("the string did not match the expected pattern") ||
+      normalizedMessage.includes("did not match the expected pattern");
+
+    if (isPatternError) {
+      if (identifyResultBox) {
+        identifyResultBox.innerHTML = `
+          <p style="color:#b00020;">
+            Il servizio di identificazione ha restituito un formato non valido.
+          </p>
+          <p>
+            L'app evita di mostrare un risultato sbagliato. Qui sotto trovi una disambiguazione prudente.
+          </p>
+        `;
+      }
+      renderFallbackCandidates();
+      return;
+    }
+
     if (identifyResultBox) {
       identifyResultBox.innerHTML = `
         <p style="color:red;">
-          Errore durante l'identificazione: ${escapeHtml(error.message)}
+          Errore durante l'identificazione: ${escapeHtml(message)}
         </p>
       `;
     }
