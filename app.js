@@ -10,7 +10,7 @@ function normalizeText(str) {
     .toString()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // rimuove accenti
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -18,7 +18,6 @@ function normalizeText(str) {
 function stripAuthorFromScientificName(name) {
   const cleaned = normalizeText(name)
     .replace(/\([^)]*\)/g, " ")
-    .replace(/[/|]/g, " ")
     .replace(/[,;].*$/g, " ")
     .replace(/\b[a-z]\./g, " ")
     .replace(/\s+/g, " ")
@@ -31,6 +30,15 @@ function stripAuthorFromScientificName(name) {
   }
 
   return cleaned;
+}
+
+function extractScientificCandidates(value) {
+  const raw = (value || "").toString();
+
+  return raw
+    .split(/[\/|]/g)
+    .map((part) => stripAuthorFromScientificName(part))
+    .filter(Boolean);
 }
 
 function getEl(...ids) {
@@ -84,6 +92,16 @@ function getPlantDescription(plant) {
   );
 }
 
+function getPlantAliases(plant) {
+  return (
+    plant.aliases ||
+    plant.dettoAnche ||
+    plant.otherNames ||
+    plant["detto/a anche"] ||
+    ""
+  );
+}
+
 /* =========================
    ELEMENTI PAGINA
 ========================= */
@@ -94,7 +112,8 @@ const plantList = getEl("plantList", "plantsList", "results", "cardsContainer");
 const detailBox = getEl("plantDetail", "detailBox", "details", "schedaDettaglio");
 
 const identifyButton = getEl("identifyBtn", "identifyButton");
-const identifyImageInput = getEl("identifyImage", "imageInput", "photoInput");
+const identifyImageInput = getEl("identifyImage", "imageInput", "photoInput", "plant-image");
+const identifyOrganSelect = getEl("identifyOrgan", "organSelect", "organ-select");
 const identifyResultBox = getEl("identifyResult", "resultBox", "identifyOutput");
 
 /* =========================
@@ -111,7 +130,7 @@ function debugTablePlants(limit = 15) {
       index: i,
       italianName: getPlantItalianName(p),
       scientificName: getPlantScientificName(p),
-      normalizedScientific: stripAuthorFromScientificName(getPlantScientificName(p))
+      normalizedScientific: extractScientificCandidates(getPlantScientificName(p)).join(" | ")
     }));
     console.table(rows);
   } catch (err) {
@@ -187,13 +206,7 @@ function filterPlants() {
   filteredPlants = allPlants.filter((plant) => {
     const italianName = normalizeText(getPlantItalianName(plant));
     const scientificName = normalizeText(getPlantScientificName(plant));
-    const aliases = normalizeText(
-      plant.aliases ||
-      plant.dettoAnche ||
-      plant.otherNames ||
-      plant["detto/a anche"] ||
-      ""
-    );
+    const aliases = normalizeText(getPlantAliases(plant));
     const category = getPlantCategory(plant);
 
     const matchesText =
@@ -290,7 +303,7 @@ function showPlantDetail(plant) {
       <p><em>${escapeHtml(getPlantScientificName(plant))}</em></p>
 
       ${fieldHtml("Categoria", plant.category || plant.categoria)}
-      ${fieldHtml("Detto/a anche", plant.aliases || plant.dettoAnche || plant.otherNames || plant["detto/a anche"])}
+      ${fieldHtml("Detto/a anche", getPlantAliases(plant))}
       ${fieldHtml("Famiglia", plant.family || plant.famiglia)}
       ${fieldHtml("Tipo biologico", plant.biologicalType || plant.tipoBiologico)}
       ${fieldHtml("Descrizione", plant.description || plant.descrizione)}
@@ -337,22 +350,25 @@ function findMatchingPlant(bestScientificName) {
 
   for (const plant of allPlants) {
     const rawScientific = getPlantScientificName(plant);
-    const normalizedFull = normalizeText(rawScientific);
-    const normalizedShort = stripAuthorFromScientificName(rawScientific);
+    const candidates = extractScientificCandidates(rawScientific);
     const normalizedBest = normalizeText(bestScientificName);
 
-    const isMatch =
-      normalizedFull === normalizedBest ||
-      normalizedShort === resultScientific ||
-      normalizedFull.includes(resultScientific) ||
-      resultScientific.includes(normalizedShort);
+    const isMatch = candidates.some((candidate) => {
+      const normalizedCandidate = normalizeText(candidate);
+
+      return (
+        normalizedCandidate === resultScientific ||
+        normalizedCandidate === normalizedBest ||
+        normalizedCandidate.includes(resultScientific) ||
+        resultScientific.includes(normalizedCandidate)
+      );
+    });
 
     if (isMatch) {
       debugLog("MATCH TROVATO:", {
         italianName: getPlantItalianName(plant),
         rawScientific,
-        normalizedFull,
-        normalizedShort,
+        candidates,
         resultScientific
       });
       return plant;
@@ -372,53 +388,62 @@ function findMatchingPlant(bestScientificName) {
    IDENTIFICAZIONE PIANTA
 ========================= */
 
-async function resizeImage(file, maxSize = 1280, quality = 0.8) {
-  const img = new Image();
-  const reader = new FileReader();
+async function resizeImage(file, maxSize = 1400, quality = 0.82) {
+  const objectUrl = URL.createObjectURL(file);
 
-  const imageLoaded = new Promise((resolve, reject) => {
-    reader.onload = (e) => {
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    img.onload = resolve;
-    img.onerror = reject;
-  });
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const image = new Image();
 
-  reader.readAsDataURL(file);
-  await imageLoaded;
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Impossibile leggere l'immagine selezionata."));
+      image.src = objectUrl;
+    });
 
-  let width = img.width;
-  let height = img.height;
+    let width = img.width;
+    let height = img.height;
 
-  if (width > height) {
-    if (width > maxSize) {
+    if (width > height && width > maxSize) {
       height = Math.round((height * maxSize) / width);
       width = maxSize;
-    }
-  } else {
-    if (height > maxSize) {
+    } else if (height >= width && height > maxSize) {
       width = Math.round((width * maxSize) / height);
       height = maxSize;
     }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Canvas non disponibile.");
+    }
+
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const blob = await new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (result) => {
+          if (result) resolve(result);
+          else reject(new Error("Impossibile convertire l'immagine."));
+        },
+        "image/jpeg",
+        quality
+      );
+    });
+
+    const safeBaseName = (file.name || "foto")
+      .replace(/\.[^.]+$/, "")
+      .replace(/[^\w\-]+/g, "_")
+      .replace(/^_+|_+$/g, "") || "foto";
+
+    return new File([blob], `${safeBaseName}.jpg`, {
+      type: "image/jpeg"
+    });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
   }
-
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0, width, height);
-
-  const blob = await new Promise((resolve) => {
-    canvas.toBlob(resolve, "image/jpeg", quality);
-  });
-
-  if (!blob) {
-    throw new Error("Impossibile ridurre l'immagine.");
-  }
-
-  return new File([blob], "foto-ridotta.jpg", { type: "image/jpeg" });
 }
 
 async function identifyPlant() {
@@ -431,23 +456,41 @@ async function identifyPlant() {
     return;
   }
 
-  const file = identifyImageInput.files[0];
-  const formData = new FormData();
-  formData.append("image", file);
+  const originalFile = identifyImageInput.files[0];
+  const organValue = identifyOrganSelect?.value || "auto";
 
   if (identifyResultBox) {
     identifyResultBox.innerHTML = `<p>Identificazione in corso...</p>`;
   }
 
-  debugLog("Invio immagine a /api/identify:", file.name);
-
   try {
+    const resizedFile = await resizeImage(originalFile);
+
+    const formData = new FormData();
+    formData.append("image", resizedFile, resizedFile.name);
+    formData.append("organ", organValue);
+
+    debugLog("Invio immagine a /api/identify:", {
+      originalName: originalFile.name,
+      resizedName: resizedFile.name,
+      resizedType: resizedFile.type,
+      organ: organValue
+    });
+
     const res = await fetch("/api/identify", {
       method: "POST",
       body: formData
     });
 
-    const data = await res.json();
+    let data;
+    const contentType = res.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+      data = await res.json();
+    } else {
+      const text = await res.text();
+      throw new Error(text || "Risposta non valida dal server.");
+    }
 
     debugLog("Risposta /api/identify:", data);
 
@@ -461,16 +504,18 @@ async function identifyPlant() {
       html += `<p><strong>Nome scientifico:</strong> ${escapeHtml(data.bestScientificName)}</p>`;
     }
 
-    if (typeof data.confidence === "number") {
-      html += `<p><strong>Affidabilità:</strong> ${(data.confidence * 100).toFixed(1)}%</p>`;
+    if (Array.isArray(data.commonNames) && data.commonNames.length) {
+      html += `<p><strong>Nomi comuni:</strong> ${escapeHtml(data.commonNames.join(", "))}</p>`;
+    }
+
+    if (typeof data.score === "number") {
+      html += `<p><strong>Affidabilità:</strong> ${(data.score * 100).toFixed(1)}%</p>`;
     }
 
     const matchedPlant = findMatchingPlant(data.bestScientificName);
 
-    console.log("Nome restituito da Pl@ntNet:", data.bestScientificName);
-    console.log("Nome normalizzato:", stripAuthorFromScientificName(data.bestScientificName));
-    console.log("Piante caricate:", allPlants.length);
-    console.log(
+    debugLog("Nome normalizzato:", stripAuthorFromScientificName(data.bestScientificName));
+    debugLog(
       "Primi nomi scientifici archivio:",
       allPlants.slice(0, 10).map(p => getPlantScientificName(p))
     );
@@ -484,9 +529,9 @@ async function identifyPlant() {
 
       showPlantDetail(matchedPlant);
       return;
-    } else {
-      html += `<p>Pianta identificata, ma non ancora presente nel tuo archivio.</p>`;
     }
+
+    html += `<p>Pianta identificata, ma non ancora presente nel tuo archivio.</p>`;
 
     if (identifyResultBox) {
       identifyResultBox.innerHTML = html;
